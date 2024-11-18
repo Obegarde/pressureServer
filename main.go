@@ -16,12 +16,12 @@ func main(){
 	//get the env variables
 	dbURL := os.Getenv("DB_URL")
 	platform := os.Getenv("PLATFORM")
-	secret := os.GetEnv("SECRET")
+	secret := os.Getenv("SECRET")
 	testApiKey := os.Getenv("TEST_API_KEY")
 	// Open a db connection
 	db, err := sql.Open("postgres", dbURL)
 	if err != nil{
-		log.Pritf("DB error: %b",err)
+		log.Printf("DB error: %b",err)
 	}
 	defer db.Close()
 
