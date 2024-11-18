@@ -1,1 +1,2 @@
-# pressureServer
+How to install:
+
