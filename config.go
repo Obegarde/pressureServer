@@ -1,8 +1,8 @@
 package main
 
-import(
-	"database/sql"
-	"github.com/obegarde/pressure/internal/database"
+import(	
+	"github.com/obegarde/pressureServer/internal/database"
+	
 
 )
 

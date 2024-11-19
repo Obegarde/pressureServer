@@ -7,6 +7,7 @@ import (
 	"github.com/joho/godotenv"
 	"os"
 	"database/sql"
+	"github.com/obegarde/pressureServer/internal/database"
 )
 
 func main(){
@@ -29,14 +30,14 @@ func main(){
 	mux := http.NewServeMux()
 	//Create api config struct
 	apiCfg := apiConfig{
-		db:db,
+		db:database.New(db),
 		platform:platform,
 		secret:secret,
 		testApiKey:testApiKey,
 	}
 	//mux.HandleFunc goes here
-
-	
+	mux.HandleFunc("POST /api/measurements",apiCfg.handlerCreateMeasurements)	
+	mux.HandleFunc("GET /api/measurements", apiCfg.handlerGetMeasurements)	
 	//Create a ServerStruct
 	server := &http.Server{
 	Addr: ":8080",
