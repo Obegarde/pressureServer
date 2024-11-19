@@ -6,3 +6,12 @@ sql:
     gen:
       go:
         out: "internal/database"
+        overrides:
+          - column: "measurements.pressure_1"
+            go_type: "float64"
+          - column: "measurements.pressure_2"
+            go_type: "float64"
+          - column: "measurements.temperature_1"
+            go_type: "float64"
+          - column: "measurements.temperature_2"
+            go_type: "float64"

@@ -15,8 +15,8 @@ type Measurement struct {
 	CreatedAt       time.Time
 	MeasurementDate time.Time
 	MeasurementTime time.Time
-	Pressure1       string
-	Pressure2       string
-	Temperature1    string
-	Temperature2    string
+	Pressure1       float64
+	Pressure2       float64
+	Temperature1    float64
+	Temperature2    float64
 }

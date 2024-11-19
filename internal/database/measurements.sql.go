@@ -36,10 +36,10 @@ RETURNING id, created_at, measurement_date, measurement_time, pressure_1, pressu
 type CreateMeasurementParams struct {
 	MeasurementDate time.Time
 	MeasurementTime time.Time
-	Pressure1       string
-	Pressure2       string
-	Temperature1    string
-	Temperature2    string
+	Pressure1       float64
+	Pressure2       float64
+	Temperature1    float64
+	Temperature2    float64
 }
 
 func (q *Queries) CreateMeasurement(ctx context.Context, arg CreateMeasurementParams) (Measurement, error) {
