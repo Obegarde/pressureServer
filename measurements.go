@@ -6,7 +6,7 @@ import(
 	"log"
 	"encoding/json"
 	"github.com/google/uuid"
-	"github.com/obegarde/pressureServer/internal/database"
+	"github.com/obegarde/pressureServer/internal/database"	
 )
 
 type CreateMeasurementParamsJSON struct {
@@ -86,8 +86,8 @@ func (cfg *apiConfig)handlerCreateMeasurements(w http.ResponseWriter, r *http.Re
 	respondWithJSON(w, 201, responseJSONList)
 }
 
-func (cfg *apiConfig)handlerGetMeasurements(w http.ResponseWriter, r *http.Request){
-	allMeasurements, err := cfg.db.GetMeasurements(r.Context())
+func (cfg *apiConfig)handlerGetMeasurements(w http.ResponseWriter, r *http.Request){	
+	allMeasurements, err := cfg.db.GetMeasurements(r.Context())	
 	if err != nil{
 		log.Println(err)
 		respondWithError(w, http.StatusInternalServerError,"Failed to retrieve measurements",err)

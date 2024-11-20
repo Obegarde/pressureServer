@@ -82,3 +82,11 @@ Goose:
 Install goose with the go package manager
 
     go install github.com/pressly/goose/v3/cmd/goose@latest
+
+
+
+Navigate to the /sql/schema folder and run a goose up command.
+It will look like this but you will need to fill in your own postgres username
+and password
+    
+    goose postgres postgres://username here:password here@localhost:5432/pressure?sslmode=disable up
