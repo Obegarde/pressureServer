@@ -30,4 +30,23 @@ SELECT *
 FROM measurements
 WHERE measurement_date BETWEEN $1 AND $2;
 
-
+-- name: CreateMeasurementsBatch :exec
+INSERT INTO measurements(
+	id,
+	created_at,
+	measurement_date,
+	measurement_time,
+	pressure_1,
+	pressure_2,
+	temperature_1,
+	temperature_2)
+VALUES(
+	gen_random_uuid(),
+	NOW(),
+	unnest($1::DATE[]),
+    	unnest($2::TIME[]),
+    	unnest($3::FLOAT8[]),
+    	unnest($4::FLOAT8[]),
+    	unnest($5::FLOAT8[]),
+    	unnest($6::FLOAT8[])
+	);

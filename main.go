@@ -36,7 +36,7 @@ func main(){
 		testApiKey:testApiKey,
 	}
 	//mux.HandleFunc goes here
-	mux.HandleFunc("POST /api/measurements",apiCfg.handlerCreateMeasurements)	
+	mux.HandleFunc("POST /api/measurements",apiCfg.handlerCreateBatchMeasurements)	
 	mux.HandleFunc("GET /api/measurements", apiCfg.handlerGetMeasurements)	
 	//Create a ServerStruct
 	server := &http.Server{

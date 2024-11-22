@@ -7,6 +7,7 @@ import(
 	"encoding/json"
 	"github.com/google/uuid"
 	"github.com/obegarde/pressureServer/internal/database"	
+	"fmt"
 )
 
 type CreateMeasurementParamsJSON struct {
@@ -31,12 +32,22 @@ type MeasurementJSON struct {
 
 
 func (cfg *apiConfig)handlerCreateMeasurements(w http.ResponseWriter, r *http.Request){
+	//Verify Api key on file
+	apiKey,err := GetApiKey(r.Header)
+	if err != nil {
+		respondWithError(w,http.StatusUnauthorized,"401 Unauthorized access", err)
+		return
+	}
+	if apiKey != cfg.testApiKey{	
+		respondWithError(w,http.StatusUnauthorized,"401 Unauthorized access", err)
+		return
+	}
 	//Make a json decoder 
 	decoder := json.NewDecoder(r.Body)
 	// Create a list of parameters so we can feed in more than measurement at a time
 	params := []CreateMeasurementParamsJSON{}
 	// Decode into the params list
-	err := decoder.Decode(&params)
+	err = decoder.Decode(&params)
 	if err != nil{
 		log.Println(err)
 		respondWithError(w, http.StatusBadRequest,"Could not decode parameters", err)
@@ -63,7 +74,9 @@ func (cfg *apiConfig)handlerCreateMeasurements(w http.ResponseWriter, r *http.Re
 			Temperature1:param.Temperature1,
 			Temperature2:param.Temperature2,
 		}
+		
 		measurement, err := cfg.db.CreateMeasurement(r.Context(),convertedParams)
+		
 		if err != nil{
 			log.Println(err)
 			respondWithError(w,http.StatusInternalServerError,"Could not create measurement entry", err)
@@ -111,3 +124,65 @@ func (cfg *apiConfig)handlerGetMeasurements(w http.ResponseWriter, r *http.Reque
 	respondWithJSON(w, 201, responseJSONList)
 	} 
 
+
+func (cfg *apiConfig)handlerCreateBatchMeasurements(w http.ResponseWriter, r *http.Request){
+	//Verify Api key on file
+	apiKey,err := GetApiKey(r.Header)
+	if err != nil {
+		respondWithError(w,http.StatusUnauthorized,"401 Unauthorized access", err)
+		return
+	}
+	if apiKey != cfg.testApiKey{	
+		respondWithError(w,http.StatusUnauthorized,"401 Unauthorized access", err)
+		return
+	}
+	//Make a json decoder 
+	decoder := json.NewDecoder(r.Body)
+	// Create a list of parameters so we can feed in more than measurement at a time
+	params := []CreateMeasurementParamsJSON{}
+	// Decode into the params list
+	err = decoder.Decode(&params)
+	if err != nil{
+		log.Println(err)
+		respondWithError(w, http.StatusBadRequest,"Could not decode parameters", err)
+		return
+	}
+	fmt.Println(len(params))
+	// Create slices for the batch insert
+	dates := make([]time.Time, len(params))
+	times := make([]time.Time, len(params))
+	pressure1s := make([]float64, len(params))
+	pressure2s := make([]float64, len(params))
+	temperature1s := make([]float64, len(params))
+	temperature2s := make([]float64, len(params))
+	//Iterate over the params splitting them out 
+	for i, p := range params{
+		dateTime, err := timeFormatter(p.MeasurementDate, p.MeasurementTime)
+		if err != nil{
+			log.Println("Failed to convert time")
+			continue
+		}
+		dates[i] = dateTime.Date
+		times[i] = dateTime.Time
+		pressure1s[i] = p.Pressure1
+		pressure2s[i] = p.Pressure2
+		temperature1s[i] = p.Temperature1
+		temperature2s[i] = p.Temperature2
+
+	}
+	batchParams := database.CreateMeasurementsBatchParams{
+		Column1: dates,
+		Column2: times,
+		Column3: pressure1s,
+		Column4: pressure2s,
+		Column5: temperature1s,
+		Column6: temperature2s,
+	}
+
+	err = cfg.db.CreateMeasurementsBatch(r.Context(), batchParams)
+	if err != nil{
+		log.Println(err)
+		respondWithError(w, http.StatusInternalServerError,"Could not insert into database", err)
+	}
+	respondWithError(w, http.StatusNoContent,"Success, no return content", fmt.Errorf("No content"))
+}

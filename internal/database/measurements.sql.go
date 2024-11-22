@@ -8,6 +8,8 @@ package database
 import (
 	"context"
 	"time"
+
+	"github.com/lib/pq"
 )
 
 const createMeasurement = `-- name: CreateMeasurement :one
@@ -63,6 +65,49 @@ func (q *Queries) CreateMeasurement(ctx context.Context, arg CreateMeasurementPa
 		&i.Temperature2,
 	)
 	return i, err
+}
+
+const createMeasurementsBatch = `-- name: CreateMeasurementsBatch :exec
+INSERT INTO measurements(
+	id,
+	created_at,
+	measurement_date,
+	measurement_time,
+	pressure_1,
+	pressure_2,
+	temperature_1,
+	temperature_2)
+VALUES(
+	gen_random_uuid(),
+	NOW(),
+	unnest($1::DATE[]),
+    	unnest($2::TIME[]),
+    	unnest($3::FLOAT8[]),
+    	unnest($4::FLOAT8[]),
+    	unnest($5::FLOAT8[]),
+    	unnest($6::FLOAT8[])
+	)
+`
+
+type CreateMeasurementsBatchParams struct {
+	Column1 []time.Time
+	Column2 []time.Time
+	Column3 []float64
+	Column4 []float64
+	Column5 []float64
+	Column6 []float64
+}
+
+func (q *Queries) CreateMeasurementsBatch(ctx context.Context, arg CreateMeasurementsBatchParams) error {
+	_, err := q.db.ExecContext(ctx, createMeasurementsBatch,
+		pq.Array(arg.Column1),
+		pq.Array(arg.Column2),
+		pq.Array(arg.Column3),
+		pq.Array(arg.Column4),
+		pq.Array(arg.Column5),
+		pq.Array(arg.Column6),
+	)
+	return err
 }
 
 const getMeasurements = `-- name: GetMeasurements :many
