@@ -19,6 +19,7 @@ func main(){
 	platform := os.Getenv("PLATFORM")
 	secret := os.Getenv("SECRET")
 	testApiKey := os.Getenv("TEST_API_KEY")
+	portToListen := os.Getenv("PORT")
 	// Open a db connection
 	db, err := sql.Open("postgres", dbURL)
 	if err != nil{
@@ -40,7 +41,7 @@ func main(){
 	mux.HandleFunc("GET /api/measurements", apiCfg.handlerGetMeasurements)	
 	//Create a ServerStruct
 	server := &http.Server{
-	Addr: ":8080",
+	Addr: portToListen,
 	Handler:mux,
 	}
 	
